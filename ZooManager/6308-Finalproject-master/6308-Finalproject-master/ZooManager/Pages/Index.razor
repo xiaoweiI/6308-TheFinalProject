@@ -1,0 +1,189 @@
+﻿@page "/"
+@using ZooManager
+
+<style>
+    button {
+        width: 75px;
+        height: 75px;
+        font-size: 50px;
+    }
+
+        button.sm {
+            display: inline-flex;
+            width: 50px;
+            height: 50px;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+        }
+
+    .direction-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .game-message {
+        font-size: 24px;
+        font-weight: bold;
+        color: red;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .start-button {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="container">
+    @if (game.IsGameOver)
+    {
+        <div class="game-message">@game.GameMessage</div>
+        <div class="start-button">
+            <button @onclick="StartGame" class="btn btn-outline-dark">Restart Game</button>
+        </div>
+    }
+    else if (!game.IsStarted)
+    {
+        <div class="start-button">
+            <button @onclick="StartGame" class="btn btn-outline-dark">Start Game</button>
+        </div>
+    }
+    else
+    {
+        <div>
+            <div class="row">
+                <div class="col-6">
+                    <h1 style="text-align:end">Add Occupant:</h1>
+                </div>
+                <div class="col-1">
+                    <button @onclick="@(() => SelectElement(new Mouse("May")))" type="button" class="sm btn btn-outline-dark">
+                        <h2>🐭</h2>
+                    </button>
+                </div>
+                <div class="col-1">
+                    <button @onclick="@(() => SelectElement(new Cat("Amy")))" type="button" class="sm btn btn-outline-dark">
+                        <h2>🐱</h2>
+                    </button>
+                </div>
+                <div class="col-1">
+                    <button @onclick="@(() => SelectElement(new Cheese()))" type="button" class="sm btn btn-outline-dark">
+                        <h2>🧀</h2>
+                    </button>
+                </div>
+                <div class="col-1">
+                    <button @onclick="@(() => SelectElement(new Wall()))" type="button" class="sm btn btn-outline-dark">
+                        <h2>🧱</h2>
+                    </button>
+                </div>
+                <div class="col-1">
+                    <button @onclick="@(() => SelectElement(new Owner()))" type="button" class="sm btn btn-outline-dark">
+                        <h2>👩</h2>
+                    </button>
+                </div>
+                <div class="col-1">
+                    <button @onclick="@(() => SelectElement(new CatToy()))" type="button" class="sm btn btn-outline-dark">
+                        <h2>🧸</h2>
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <hr />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <h1 style="text-align:end">Selected Element:</h1>
+                </div>
+                <div class="col-6">
+                    <button disabled type="button" class="btn btn-outline-dark">
+                        <h2>@selectedElement?.emoji @selectedElement?.ToString()</h2>
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <hr />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <table align="center">
+                        @for (var y = 0; y < game.Size; y++)
+                        {
+                            <tr>
+                                @for (var x = 0; x < game.Size; x++)
+                                {
+                                    var zone = Game.animalZones[x][y];
+                                    var displayEmoji = zone.occupant switch
+                                    {
+                                        Mouse mouse => mouse.GetEmojiWithLife(),
+                                        Cat cat => cat.GetEmojiWithLife(),
+                                        _ => zone.emoji
+                                    };
+                                    <td>
+                                        <button @onclick="@(() => { game.SetSelectedOccupant(selectedElement); game.ZoneClick(zone);})"
+                                                type="button" class="btn btn-outline-dark">
+                                            @if (zone.occupant != null)
+                                            {
+                                                <h2>@displayEmoji</h2>
+                                            }
+                                            else
+                                            {
+                                                <h2></h2>
+                                            }
+                                        </button>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+            <div class="direction-buttons">
+                <button @onclick="() => MoveMouse(Direction.up)" class="sm btn btn-outline-dark">⬆️</button>
+                <div>
+                    <button @onclick="() => MoveMouse(Direction.left)" class="sm btn btn-outline-dark">⬅️</button>
+                    <button @onclick="() => MoveMouse(Direction.right)" class="sm btn btn-outline-dark">➡️</button>
+                </div>
+                <button @onclick="() => MoveMouse(Direction.down)" class="sm btn btn-outline-dark">⬇️</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private Occupant selectedElement;
+    private Game game = new Game();
+
+    private void SelectElement(Occupant element)
+    {
+        selectedElement = element;
+    }
+
+    private void PlaceElement(int x, int y)
+    {
+        if (selectedElement != null)
+        {
+            game.AddElement(selectedElement, x, y);
+            selectedElement = null; // Reset selected element after placing
+        }
+    }
+
+    private void MoveMouse(Direction direction)
+    {
+        game.MoveMouse(direction);
+    }
+
+    private void StartGame()
+    {
+        game.SetUpGame();
+    }
+
+}
