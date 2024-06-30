@@ -132,12 +132,12 @@
                 </div>
             </div>
             <div class="direction-buttons">
-                <button @onclick="() => MoveMouse(Direction.up)" class="sm btn btn-outline-dark">⬆️</button>
+                <button @onclick="() => MoveMouse(Direction.Up)" class="sm btn btn-outline-dark">⬆️</button>
                 <div>
-                    <button @onclick="() => MoveMouse(Direction.left)" class="sm btn btn-outline-dark">⬅️</button>
-                    <button @onclick="() => MoveMouse(Direction.right)" class="sm btn btn-outline-dark">➡️</button>
+                    <button @onclick="() => MoveMouse(Direction.Left)" class="sm btn btn-outline-dark">⬅️</button>
+                    <button @onclick="() => MoveMouse(Direction.Right)" class="sm btn btn-outline-dark">➡️</button>
                 </div>
-                <button @onclick="() => MoveMouse(Direction.down)" class="sm btn btn-outline-dark">⬇️</button>
+                <button @onclick="() => MoveMouse(Direction.Down)" class="sm btn btn-outline-dark">⬇️</button>
             </div>
         </div>
     }
@@ -157,6 +157,7 @@
         if (selectedElement != null)
         {
             game.AddElement(selectedElement, x, y);
+            selectedElement = null; // Clear the selected element after placing
         }
     }
 
@@ -167,6 +168,7 @@
 
     private void StartGame()
     {
-        game.SetUpGame();
+        game = new Game();
+        game.IsStarted = true;
     }
 }
